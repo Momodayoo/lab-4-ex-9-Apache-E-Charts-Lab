@@ -17,17 +17,36 @@
         let options = {
             title: { text: 'Fake Store Categories' },
             xAxis: {
-                data: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Potato',]
+                data: ['Category 1', 'Category 2', 'Category 3', 'Category 4',]
             },
             yAxis: {},
             series: [{
                 name: '# products',
                 type: 'bar',
-                data: [0, 1, 5, 2, 4]
+                data: [0, 1, 5, 2,]
             }]
         };
         fetch('https://fakestoreapi.com/products')
             .then((response) => response.json())
+            .then ((data)) => {}
+            // process data extracted
+            let categories = {};
+            data.forEach(product => {
+                if (product.category in categories) {
+                    categories[product.category] += 1;
+                } else {
+                    categories [product.category] = 1;
+                }
+                
+            });
+
+            // convert processed data into arrays for chart 
+            const categoryNames = Object.keys(categories);
+            const productCounts = Object.values (categories);
+
+            // set option for chart and rendering 
+            myChart.setOption(options);
+        
             .then((json) => {
                 console.log(json)
                 // use this JSON to find and set correct option data for the chart
