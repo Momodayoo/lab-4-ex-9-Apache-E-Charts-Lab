@@ -28,35 +28,42 @@
         };
         fetch('https://fakestoreapi.com/products')
             .then((response) => response.json())
-            .then ((data)) => {}
-            // process data extracted
-            let categories = {};
-            data.forEach(product => {
-                if (product.category in categories) {
-                    categories[product.category] += 1;
-                } else {
-                    categories [product.category] = 1;
-                }
-                
-            });
-
-            // convert processed data into arrays for chart 
-            const categoryNames = Object.keys(categories);
-            const productCounts = Object.values (categories);
-
-            // set option for chart and rendering 
-            myChart.setOption(options);
-        
             .then((json) => {
                 console.log(json)
                 // use this JSON to find and set correct option data for the chart
+                updateChartOptions(json);
             })
             .then(() => {
                 // Display the chart
                 myChart.setOption(options);
             })
+
         // Initialise the echarts instance based on the prepared div
         let myChart = echarts.init(document.getElementById('main'));
+
+        // multiple ways to go about this, but a Map data structure is helpful
+        function updateChartOptions(products) {
+            let categories = new Map();
+
+            products.forEach(product => {
+                let existingCatCount = categories.get(product.category)
+
+                // if we've seen this category already, add one to the product count
+                if (existingCatCount > 0) {
+                    categories.set(product.category, ++existingCatCount)
+                } else {
+                    // otherwise this is the first product for this category, so set count to 1
+                    categories.set(product.category, 1)
+                }
+            });
+            console.log(categories)
+
+            // the keys in the map are the product category names, just need to convert to an array
+            options.xAxis.data = [...categories.keys()]
+
+            // the values in the map are the category counts, just need to convert to an array
+            options.series[0].data = [...categories.values()]
+        }
     </script>
 </body>
 
